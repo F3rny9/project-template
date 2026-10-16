@@ -1,10 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pnpm install*)",
-      "Bash(pnpm run *)",
-      "Bash(pnpm dlx *)",
-      "Bash(pnpm *)",
       "Bash(git status)",
       "Bash(git diff*)",
       "Bash(git log*)",
@@ -12,6 +8,42 @@
       "Bash(find . *)",
       "Bash(grep *)"
     ],
-    "deny": []
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf $HOME)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact|fork",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C:\\Users\\farias\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/session-start.py"],
+            "timeout": 10,
+            "statusMessage": "Loading project security posture"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C:\\Users\\farias\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/pretool-gate.py"],
+            "timeout": 10,
+            "statusMessage": "Security pre-check"
+          }
+        ]
+      }
+    ]
   }
 }

@@ -256,6 +256,10 @@ Si un archivo de `docs/` no existe todavía, pregunta antes de asumir.
 - No instalar servidores MCP por tu cuenta: pregunta antes, según el "Protocolo de MCPs".
 - No ejecutar un `claude mcp add` copiado de una fuente que no sea el proveedor oficial, ni sin
   haberle enseñado antes el comando al usuario.
+- No usar el alias de Microsoft Store como intérprete Python en los hooks (`.claude/settings.json`).
+  En un equipo nuevo, verifica con `(Get-Command python).Source` que la ruta no contiene
+  `WindowsApps`. Si la contiene, actualiza `"command"` en ambos hooks con la ruta real:
+  `py -3 -c "import sys; print(sys.executable)"`.
 - <!-- ... -->
 
 ---
