@@ -68,7 +68,7 @@ HIGH_IMPACT = [
     (r"(?i)\bplink\b[^\n]*\s-[RLD]\b", "PuTTY plink port forwarding / tunnel"),
     (r"(?i)\breg(\.exe)?\s+(add|delete)\b[^\n]*\\(Run|RunOnce)\b", "Autorun registry persistence"),
     (r"(?i)\b(New|Set)-ItemProperty\b[^\n]*\\CurrentVersion\\Run", "Autorun registry persistence"),
-    (r"\brm\s+-rf\s+(/+|~/|~|\$HOME/|\$HOME)(\s|$)", "Recursive delete of filesystem root or home directory"),
+    (r"\brm\s+-(?:[a-z]*r[a-z]*f|[a-z]*f[a-z]*r)[a-z]*(?:\s+--\S+)*\s+(/+|~/|~|\$(?:HOME|\{HOME\})/?)(\s|[;&|]|$)", "Recursive delete of filesystem root or home directory"),
     (r"(?i)\bRemove-Item\b[^\n]*\b-Recurse\b[^\n]*\b-Force\b[^\n]*[A-Za-z]:\\(\s|\"|')*(\*)?\s*$", "Recursive force-delete of a drive root"),
 ]
 
