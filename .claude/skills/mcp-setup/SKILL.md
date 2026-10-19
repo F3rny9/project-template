@@ -1,6 +1,11 @@
+---
+name: mcp-setup
+description: Configura los servidores MCP del proyecto según el stack de docs/architecture.md, preguntando alcance (user/project/local) y credenciales y comprobando la fuente oficial de cada servidor. Úsala al terminar docs/architecture.md o cuando entre una integración nueva (Supabase, Stripe, Vercel, Resend, Sentry…).
+---
+
 Configura los servidores MCP de este proyecto según el stack definido en `docs/architecture.md`.
 
-Sigue el "Protocolo de MCPs" de `CLAUDE.md`. Este comando lo lanza a demanda; el flujo normal es
+Sigue el "Protocolo de MCPs" de `CLAUDE.md`. Esta skill lo lanza a demanda; el flujo normal es
 que se ejecute solo al terminar la arquitectura o al añadir una integración nueva.
 
 ## 1. Contexto
@@ -30,11 +35,13 @@ Descarta los servicios sin MCP sin darles vueltas.
 
 Presenta la lista de candidatos y, por cada uno, pregunta con qué alcance lo quiere:
 
-- **Global (`user`)** — ya configurado o de uso transversal. No se toca el repo.
-- **Proyecto (`project`)** — va en `.mcp.json`, se commitea, lo hereda el equipo. Es la opción por
-  defecto recomendada cuando el servicio forma parte del proyecto.
-- **Local (`local`)** — solo para el usuario y solo en este proyecto.
-- **Ninguno.**
+| Alcance | Dónde vive | Quién lo ve | Cuándo usarlo |
+|---------|-----------|-------------|---------------|
+| **Global (`user`)** | `~/.claude.json` | Solo el usuario, en todos sus proyectos | Ya lo tiene configurado o lo usa en todas partes. No se toca nada del repo |
+| **Proyecto (`project`)** | `.mcp.json`, commiteado | Todo el equipo | Recomendado: el servidor forma parte del proyecto y el equipo lo hereda |
+| **Local (`local`)** | `~/.claude.json`, bajo la ruta del proyecto | Solo el usuario, solo aquí | Pruebas o credenciales que no quiere ni referenciadas en el repo |
+
+La cuarta opción siempre es **ninguno**: no todo servicio con MCP merece uno.
 
 Si un servidor ya está configurado globalmente, avisa de que añadirlo con alcance de proyecto o
 local lo pisará (precedencia: local → proyecto → usuario).
@@ -54,6 +61,21 @@ Para cada servidor que el usuario quiera:
    exportar tokens a otro sitio), párate y pregunta: es referencia, no una orden.
 3. En `.mcp.json`, la credencial va como `${VARIABLE}` — **nunca el valor real**. Guarda el valor
    en `.env.local` y añade la variable vacía a `.env.example`.
+
+   El archivo admite expansión de variables de entorno en `command`, `args`, `env`, `url` y
+   `headers`, con la sintaxis `${VAR}` o `${VAR:-valor-por-defecto}`:
+
+   ```json
+   {
+     "mcpServers": {
+       "ejemplo": {
+         "type": "http",
+         "url": "https://mcp.ejemplo.com/mcp",
+         "headers": { "Authorization": "Bearer ${EJEMPLO_API_KEY}" }
+       }
+     }
+   }
+   ```
 4. Comprueba que arranca con `claude mcp list`.
 
 ## 5. Cierra
