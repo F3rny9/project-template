@@ -115,6 +115,65 @@ Cada una vive en `.claude/skills/<nombre>/SKILL.md`. Las invocas tú con `/nombr
 
 ---
 
+## Seguridad
+
+Esta plantilla incluye controles de seguridad que ayudan a prevenir operaciones destructivas accidentales y a detectar comandos sensibles:
+
+- **Reglas de denegación (`deny`)** — Bloques explícitos en `.claude/settings.json` para comandos peligrosos: `rm -rf /`, `rm -rf ~`, `git push --force`, etc. Estos intentos son rechazados antes de ejecutarse.
+- **Hooks de seguridad** — Scripts Python en `.claude/hooks/` que se ejecutan en momentos clave:
+  - **SessionStart** (`session-start.py`): Recuerda las reglas del proyecto al iniciar sesión (complementa la política global v3.2).
+  - **PreToolUse** (`pretool-gate.py`): Analiza comandos de Bash/PowerShell antes de ejecutarlos y clasifica su riesgo (READ / TEST / WRITE / SENSITIVE / HIGH IMPACT).
+
+**Nota:** Los hooks son defensa en profundidad, no controles de seguridad duros. El modelo de permisos de Claude Code y las herramientas de seguridad del sistema operativo son los autoridades.
+
+---
+
+## Revisión de seguridad antes de producción
+
+Antes de mergear código a producción o ante sospecha de vulnerabilidades:
+
+1. Ejecuta `/security-review` desde Claude Code.
+2. Esta skill carga `security-audit-readonly`, que realiza una auditoría estrictamente de solo lectura sobre:
+   - Código fuente (patterns, secretos, credenciales filtradas)
+   - Configuración (`.mcp.json`, `.env.example`, hooks)
+   - Dependencias (vulnerabilidades conocidas)
+   - Control de acceso
+3. El informe se genera en `docs/security/audit.md` sin modificar nada.
+
+**No confundas esto con revisión de código**: es una auditoría de seguridad específica, no un análisis general de lógica o estilo.
+
+---
+
+## Creación local de proyectos
+
+Si quieres crear una copia de esta plantilla **sin usar GitHub**:
+
+1. Pide al agente: *"Copia esta plantilla a `C:\datos\NOMBRE_PROYECTO`"*, donde `NOMBRE_PROYECTO` es el nombre que desees.
+2. El agente copia toda la estructura (documentos, skills, hooks, configuración) **excepto la carpeta `.git`**.
+3. No modifica la plantilla original ni necesita acceso a GitHub.
+
+**Diferencia con `/init-proyecto`:**
+- **Copia local**: solo replica la carpeta. El nuevo proyecto está listo para trabajar, pero no está inicializado (documentos vacíos, `.template/` aún presente).
+- **`/init-proyecto`**: rellena la documentación contigo, convierte la plantilla en tu repositorio real y borra `.template/` y archivos de plantilla innecesarios. Se ejecuta dentro de un proyecto, no como copia previa.
+
+**Diferencia con GitHub:**
+- **Usar esta plantilla en GitHub** crea un nuevo repositorio remoto con todo versionado.
+- **Copia local** es solo el contenido del proyecto-template en tu máquina local. Si quieres versionarlo después, tendrás que inicializar `.git` por tu cuenta.
+
+---
+
+## Hooks globales vs. del proyecto
+
+Los hooks de seguridad en esta plantilla (`.claude/hooks/`) se aplican solo dentro de este proyecto cuando lo abres en Claude Code.
+
+- Son **independientes** de los hooks globales que tengas en tu perfil de usuario (`~/.claude/`).
+- No se copian automáticamente a otros proyectos: cada proyecto tiene sus propias reglas.
+- Si cloneas esta plantilla o creas una copia local, los hooks se copian con ella, pero el agente no hereda ganchos de otros lugares.
+
+Para entender cómo coexisten los controles de proyecto y globales, ver la política de seguridad en el archivo global `CLAUDE.md` de tu usuario.
+
+---
+
 ## Convenciones
 
 - Gestor de paquetes: **pnpm v11** (no npm, no yarn).
