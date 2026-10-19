@@ -14,8 +14,11 @@
     ],
     "deny": [
       "Bash(rm -rf /)",
+      "Bash(rm -rf //)",
       "Bash(rm -rf ~)",
+      "Bash(rm -rf ~/)",
       "Bash(rm -rf $HOME)",
+      "Bash(rm -rf $HOME/)",
       "Bash(git push --force*)",
       "Bash(git push -f*)"
     ]
